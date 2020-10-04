@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>建築物雨水貯留設計概要</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+</head>
+<body>
+    <div id="app">
+        <div>
+            <span>日平均降雨量(R)</span>
+            <input type="text" v-model="R">
+            <span>(mm/日)</span>
+        </div>
+        <div>
+            <span>日降雨概率(P)</span>
+            <input type="text" v-model="P">
+        </div>
+        <div>
+            <span>儲水倍數(Ns)</span>
+            <input type="text" v-model="Ns">
+        </div>
+        <div>
+            <span>居室總樓地板面積(Af)</span>
+            <input type="text" v-model="Af">
+            <span>m²</span>
+        </div>
+        <div>
+            <span>建築類別用水量推估(Wf) = </span>
+            <input type="text" v-model="Wf">
+            <span>(公升/ m²∙日)</span>
+        </div>
+        <div><span>
+            Wt = Wf * Af = {{Wf}} x {{Af}} = {{Wt}}
+        </span></div>
+
+        <br><br>
+        <div>
+            <span>集雨面積(Ar)= 屋頂平面集雨面積+屋突立面有效集雨面積</span>
+            <br>
+            <input type="number" v-model="Ar1" placeholder="屋頂平面集雨面積">
+            <span>+</span>
+            <input type="number" v-model="Ar2" placeholder="屋突立面有效集雨面積">
+            <span> = {{Ar.toFixed(2)}}</span>
+            <span>平方公尺</span>
+        </div>
+        <div>
+            <span>Wr = 基地所在地區日降雨量R x設計集雨面積Ar x日降雨概率P =</span>
+            <br>
+            <span>{{R}} x {{Ar}} x {{P}} = {{Wr.toFixed(2)}} </span>
+            <span>公升/日</span>
+        </div>
+        <div>
+            <span>Wd = 設計預定利用雨水取代自來水之設備使用水量 = </span>
+            <input type="text" v-model="Wd">
+            <span>公升/日</span>
+        </div>
+        <div>
+            <span>當 Wr ≧ Wd 時 Ws  = Wr </span>
+            <br>
+            <div style="padding-left: 20px;" v-if="Wr >= Wd">
+                <span style="color: green;">Wr ≧ Wd, </span>
+                <span>Ws = Wr = {{Wd}}</span>
+            </div>
+            <span v-else style="color: red;">Wr ≦ Wd</span>
+        </div>
+        <br> <br>
+        <div>
+            <span>最小雨水儲留槽容積(Vsm) =儲水倍數 Ns x Ws =</span>
+            <br>
+            <span>{{Ns}}x{{Ws}} = {{Vsm}} 公升 ≒ {{(Vsm/1000).toFixed(2)}} 噸 (m3)</span>
+        </div>
+        <div>
+            <span>雨水儲留槽設計容積(Vs) = </span>
+            <input type="number" v-model="Vs">
+            <span v-if="Vs>(Vsm/1000)" style="color:green">></span>
+            <span v-else style="color: red;"> < </span>
+            <span>{{(Vsm/1000).toFixed(2)}} 噸</span>
+        </div>
+        <div>
+            <h3>判斷式</h3>
+            <p>Rc(雨水貯留利用率) > Rcc(雨水貯留利用率基準值) 4%</p>
+            <span>Rc = (自來水替代水量WS) ÷ (總用水量Wt) = Ws ÷ (Wf x Af)</span>
+            <br>
+            <span>= {{Ws}}÷ ( {{Wf}} （公升/ m²∙日）  x {{Af}} (m²) )</span>
+            <br>
+            <span>= {{Rc.toFixed(2)}}%</span>
+            <span v-if="Rc>=4" style="color:green">≧ 4% (合格基準)</span>
+            <span v-else style="color:red" >≦ 4% (不合格)</span>
+            
+
+        </div>
+    </div>
+    
+</body>
+
+<script>
+    let app = new Vue({
+        el:"#app",
+        data:{
+            R:6.59,
+            P:0.463,
+            Ns:6.48,
+            Wf:9,
+            Af:14474,
+            Ar1:2097.95,
+            Ar2:167.9,
+            Wd:6000,
+            Vs:104.54
+        },
+        computed:{
+            Ar(){
+                return (parseFloat(this.Ar1)+ parseFloat(this.Ar2));
+            },
+            Wr(){
+                return (parseFloat(this.R)*parseFloat(this.Ar)*parseFloat(this.P))
+            },
+            Vsm(){
+                return (parseFloat(this.Ns)*parseFloat(this.Wd));
+            },
+            Ws(){
+                return parseFloat(this.Wd)
+            },
+            Wt(){
+                return (parseFloat(this.Wf)*parseFloat(this.Af))
+            },
+            Rc(){
+                return (parseFloat(this.Ws)/(parseFloat(this.Wf)*parseFloat(this.Af)))*100;
+            }
+        }
+    })
+</script>
+</html>
